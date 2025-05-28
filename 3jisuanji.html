@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>计算机操作知识</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Noto Sans SC', sans-serif;
+      background-color: #f4f6f9;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background-color: #003366;
+      color: #fff;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    main {
+      max-width: 960px;
+      margin: 30px auto;
+      padding: 0 20px;
+    }
+    .question {
+      background-color: #fff;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+      transition: box-shadow 0.3s ease;
+    }
+    .question:hover {
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.1);
+    }
+    .question p {
+      font-size: 18px;
+      font-weight: 700;
+    }
+    label {
+      display: block;
+      margin: 8px 0;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    input[type="radio"], input[type="checkbox"] {
+      margin-right: 8px;
+      transform: scale(1.2);
+    }
+    .result {
+      margin-top: 12px;
+      padding: 10px;
+      border-radius: 6px;
+      font-size: 16px;
+    }
+    .correct {
+      background-color: #e7f6e7;
+      color: #2e7d32;
+      border-left: 5px solid #2e7d32;
+    }
+    .incorrect {
+      background-color: #fdecea;
+      color: #c62828;
+      border-left: 5px solid #c62828;
+    }
+    .hint, .clear-btn, .counter {
+      margin-top: 8px;
+      display: inline-block;
+      font-size: 14px;
+      color: #666;
+      cursor: pointer;
+      text-decoration: underline;
+      margin-right: 16px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>计算机操作知识</h1>
+    <p>点击选项即可判断正误，多选题支持清空与选项统计</p>
+  </header>
+  <main id="quiz"></main>
+  <script>
+    const questions = [
+  { type: "single", text: "1. 在 Windows 中用来浏览与管理文件/文件夹的核心工具是（ ）", options: ["Excel", "PowerPoint", "Notepad", "File Explorer"], answer: "File Explorer", explanation: "File Explorer 是 Windows 默认文件管理器，负责复制、移动、删除与属性查看等操作。" },
+  { type: "single", text: "2. Windows 快捷键：新建窗口/文件常用组合键是（ ）", options: ["Ctrl + N", "Ctrl + O", "Ctrl + S", "Ctrl + Alt + Del"], answer: "Ctrl + N", explanation: "Ctrl + N 在多数程序中代表 “New”，能快速提高日常办公效率。" },
+  { type: "single", text: "3. 查看并管理硬件驱动和状态的系统组件是（ ）", options: ["Paint", "WordPad", "Device Manager", "Photos"], answer: "Device Manager", explanation: "Device Manager 统一列出硬件设备、驱动版本与冲突信息，是排障首选。" },
+  { type: "single", text: "4. Windows 中用于保存每位用户文件与配置的默认根目录为（ ）", options: ["Program Files", "Users", "Documents", "Windows"], answer: "Users", explanation: "“C:\Users\用户名” 存放桌面、文档等个人数据，便于多账户隔离。" },
+  { type: "single", text: "5. AI 训练场景下，持久存储训练数据和模型首选设备是（ ）", options: ["HDD", "磁带", "SSD", "ROM"], answer: "SSD", explanation: "SSD 读写速度远高于 HDD，可显著缩短数据加载与模型 checkpoint 时间。" },
+  { type: "multiple", text: "6. 以下哪些设备常同时参与 AI 模型训练过程？（多选）", options: ["RAM", "ROM", "SSD", "HDD", "光盘"], answer: ["RAM", "SSD", "HDD"], explanation: "RAM 负责高速暂存，SSD/HDD 负责大容量持久化；ROM/光盘基本不参与训练。" },
+  { type: "judge", text: "7. 随机访问存储器（RAM）主要承担临时数据读写，不用于长期存放操作系统。", options: ["对", "错"], answer: "对", explanation: "RAM 断电即失数据，OS 核心应安装在 SSD/HDD 等非易失介质。" },
+  { type: "judge", text: "8. SSD 在 AI 领域“常用于存储训练数据”这一说法正确。", options: ["对", "错"], answer: "对", explanation: "高 IOPS + 低延迟正是大规模迭代训练所需。" },
+  { type: "judge", text: "9. 操作系统属于应用软件。", options: ["对", "错"], answer: "错", explanation: "OS 为系统软件，负责抽象和调度硬件资源，为应用提供接口。" },
+  { type: "single", text: "10. 编译器的主要职能是（ ）", options: ["运行程序", "存储数据", "将高级语言翻译成机器代码", "管理数据库"], answer: "将高级语言翻译成机器代码", explanation: "把人类可读代码转成 CPU 可执行二进制，属于系统软件工具链。" },
+  { type: "single", text: "11. SQL 的完整英文名称是（ ）", options: ["Structured Query Language", "Simple", "Standard", "System"], answer: "Structured Query Language", explanation: "面向关系数据库的事实标准语言，支持查询、DDL、DML。" },
+  { type: "single", text: "12. 下列哪一项不属于软件开发生命周期（SDLC）阶段？", options: ["需求分析", "设计", "实现", "数据录入"], answer: "数据录入", explanation: "SDLC 包括需规→设计→编码→测试→运维，数据录入是业务操作而非开发阶段。" },
+  { type: "judge", text: "13. 开源软件的源代码公开，可被合法地查看与修改。", options: ["对", "错"], answer: "对", explanation: "前提是遵守相应开源许可证（GPL、MIT 等）的条款限制。" },
+  { type: "single", text: "14. 病毒扫描程序最常用的文件系统遍历策略是（ ）", options: ["DFS", "BFS", "A*", "最短路径"], answer: "BFS", explanation: "广度优先可系统化遍历目录层级，减少遗漏并便于分阶段扫描。" },
+  { type: "single", text: "15. 下列算法中，不适合直接用作病毒“分类”模型的是（ ）", options: ["决策树", "神经网络", "K-means 聚类", "SVM"], answer: "K-means 聚类", explanation: "K-means 属无监督聚类，不产生类别标签；其更多用来探索模式而非分类。" },
+  { type: "single", text: "16. 终端安全防护主要保护的对象是（ ）", options: ["服务器", "网络设备", "个人电脑和移动设备", "打印机"], answer: "个人电脑和移动设备", explanation: "“终端”指网络末端的用户设备，是攻击频发点。" },
+  { type: "multiple", text: "17. 常见终端安全措施包括（多选）", options: ["安装杀毒软件", "启用防火墙", "定期系统更新", "警惕未知邮件/链接", "关闭 VPN"], answer: ["安装杀毒软件", "启用防火墙", "定期系统更新", "警惕未知邮件/链接"], explanation: "组合防护可覆盖恶意代码、入侵流量与社会工程学攻击。" },
+  { type: "judge", text: "18. 使用 VPN 能提升公共网络环境下终端的数据传输安全性。", options: ["对", "错"], answer: "对", explanation: "VPN 隧道加密通信，防止 Wi-Fi 嗅探及中间人攻击。" },
+  { type: "single", text: "19. 防病毒软件的核心职能是（ ）", options: ["压缩文件", "备份系统", "扫描并清除恶意软件", "浏览网页"], answer: "扫描并清除恶意软件", explanation: "结合特征库、启发式与行为监控三大引擎。" },
+  { type: "judge", text: "20. “启发式扫描”指防病毒软件通过监控可疑行为来发现未知威胁。", options: ["对", "错"], answer: "对", explanation: "检测逻辑偏向行为模式而非固定特征码，可识别变种或零日漏洞恶意代码。" }
+];
+
+    const quizDiv = document.getElementById("quiz");
+
+    questions.forEach((q, index) => {
+      const container = document.createElement("div");
+      container.className = "question";
+      container.innerHTML = `<p>${q.text}</p>`;
+      let optionsHTML = "";
+
+      if (q.type === "single" || q.type === "judge") {
+        q.options.forEach(opt => {
+          optionsHTML += `<label><input type="radio" name="q${index}" value="${opt}" onchange="checkAnswer(${index})"> ${opt}</label>`;
+        });
+      } else if (q.type === "multiple") {
+        q.options.forEach(opt => {
+          optionsHTML += `<label><input type="checkbox" name="q${index}" value="${opt}" onchange="checkMultiple(${index})"> ${opt}</label>`;
+        });
+        optionsHTML += `<div class="counter" id="counter${index}">已选择 0 项</div>`;
+        optionsHTML += `<div class="clear-btn" onclick="clearMultiple(${index})">清空选择</div>`;
+      }
+
+      container.innerHTML += optionsHTML;
+      container.innerHTML += `<div class="hint" onclick="showHint(${index})">查看答案提示</div>`;
+      container.innerHTML += `<div id="result${index}" class="result"></div>`;
+      quizDiv.appendChild(container);
+    });
+
+    function checkAnswer(i) {
+      const q = questions[i];
+      const inputs = document.getElementsByName(`q${i}`);
+      let userAnswer;
+
+      for (let input of inputs) {
+        if (input.checked) {
+          userAnswer = input.value;
+          break;
+        }
+      }
+      const correct = userAnswer === q.answer;
+      document.getElementById(`result${i}`).innerHTML = `<div class="${correct ? 'correct' : 'incorrect'}">${correct ? '✔ 回答正确：' : '✘ 回答错误：'}${q.explanation}</div>`;
+    }
+
+    function checkMultiple(i) {
+      const q = questions[i];
+      const inputs = document.getElementsByName(`q${i}`);
+      const selected = Array.from(inputs).filter(input => input.checked);
+      document.getElementById(`counter${i}`).textContent = `已选择 ${selected.length} 项`;
+      if (selected.length < q.answer.length) return;
+      const userAnswer = selected.map(i => i.value).sort();
+      const correctAnswer = q.answer.slice().sort();
+      const correct = JSON.stringify(userAnswer) === JSON.stringify(correctAnswer);
+      document.getElementById(`result${i}`).innerHTML = `<div class="${correct ? 'correct' : 'incorrect'}">${correct ? '✔ 回答正确：' : '✘ 回答错误：'}${q.explanation}</div>`;
+    }
+
+    function clearMultiple(i) {
+      const inputs = document.getElementsByName(`q${i}`);
+      inputs.forEach(input => input.checked = false);
+      document.getElementById(`counter${i}`).textContent = `已选择 0 项`;
+      document.getElementById(`result${i}`).innerHTML = "";
+    }
+
+    function showHint(i) {
+      const q = questions[i];
+      document.getElementById(`result${i}`).innerHTML = `<div class="correct">提示：${q.explanation}</div>`;
+    }
+  </script>
+</body>
+</html>
