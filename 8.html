@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>职业道德与AI伦理互动练习</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    *{box-sizing:border-box;}
+    body{font-family:'Noto Sans SC',sans-serif;background:#f4f6f9;margin:0;padding:0}
+    header{background:#003366;color:#fff;padding:20px;text-align:center;box-shadow:0 2px 4px rgba(0,0,0,.1)}
+    main{max-width:960px;margin:30px auto;padding:0 20px}
+    .question{background:#fff;border-radius:12px;padding:20px;margin-bottom:24px;box-shadow:0 4px 10px rgba(0,0,0,.08);transition:box-shadow .3s}
+    .question:hover{box-shadow:0 6px 14px rgba(0,0,0,.1)}
+    .question p{font-size:18px;font-weight:700}
+    label{display:block;margin:8px 0;font-size:16px;cursor:pointer}
+    input[type=radio],input[type=checkbox]{margin-right:8px;transform:scale(1.2)}
+    .result{margin-top:12px;padding:10px;border-radius:6px;font-size:16px}
+    .correct{background:#e7f6e7;color:#2e7d32;border-left:5px solid #2e7d32}
+    .incorrect{background:#fdecea;color:#c62828;border-left:5px solid #c62828}
+    .hint,.clear-btn,.counter{margin-top:8px;display:inline-block;font-size:14px;color:#666;cursor:pointer;text-decoration:underline;margin-right:16px}
+  </style>
+</head>
+<body>
+  <header>
+    <h1>职业道德与AI伦理互动练习</h1>
+    <p>点击选项即可判断正误，多选题支持清空与选项统计</p>
+  </header>
+  <main id="quiz"></main>
+  <script>
+    const questions=[
+{type:"single",text:"1. BPM 的核心目标是（ ）",options:["提高产品质量","优化企业运营流程","提升员工满意度","扩大市场占有率"],answer:"优化企业运营流程",explanation:"BPM 关注端到端流程效率，以整体运营最优为最终目的，而非局部质量或单点满意度。"},
+{type:"single",text:"2. 哪项原则体现“以客户需求驱动流程设计”的思想？",options:["流程标准化","客户驱动流程","流程自动化","流程柔性化"],answer:"客户驱动流程",explanation:"客户驱动确保所有流程环节围绕客户价值展开，是 BPM 的首要设计原则。"},
+{type:"single",text:"3. 在 BPM 中，“持续改进”指（ ）",options:["一次性彻底优化","定期评估并更新流程","忽视细微问题","仅在必要时调整"],answer:"定期评估并更新流程",explanation:"持续改进强调 PDCA 循环，通过周期性评估与修正保持流程活力。"},
+{type:"multiple",text:"4. 跨部门协作在流程管理中的直接益处包括（ ）",options:["提高工作速度","减少信息孤岛","增加员工工作量","降低沟通成本"],answer:["提高工作速度","减少信息孤岛","降低沟通成本"],explanation:"协同可缩短等待时间、共享数据、减少反复沟通，从而提速并降本。"},
+{type:"judge",text:"5. BPM 设计阶段应充分考虑信息技术的应用以提升流程效率。",options:["对","错"],answer:"对",explanation:"IT 是流程自动化与数据驱动决策的基础，故需前置规划。"},
+{type:"single",text:"6. BPM 的英文全称是（ ）",options:["Business Process Planning","Business Process Maintenance","Business Process Management","Business Process Monitoring"],answer:"Business Process Management",explanation:"BPM = Business Process Management。"},
+{type:"judge",text:"7. “流程优化的目标是消除所有可能的风险。”",options:["对","错"],answer:"错",explanation:"目标是降低风险至可接受水平而非绝对消除，否则成本与收益失衡。"},
+{type:"multiple",text:"8. BPM 风险管理的正确做法包括（ ）",options:["风险评估需识别风险大小与概率","风险管理是持续过程，需定期评估","识别风险后可不制定应对策略","识别风险即可停止监控"],answer:["风险评估需识别风险大小与概率","风险管理是持续过程，需定期评估"],explanation:"识别-评估-应对-监控是闭环，缺一不可。"},
+{type:"single",text:"9. BPR 的根本目的在于（ ）",options:["小幅改进","彻底重塑业务流程","降低离职率","控制营销成本"],answer:"彻底重塑业务流程",explanation:"BPR 旨在跳出现有框架，取得数量级改善。"},
+{type:"single",text:"10. 企业通常在何种情形下启动 BPR？",options:["日常维护","规模稳定","面临经营危机或重大变革需求","财务状况良好"],answer:"面临经营危机或重大变革需求",explanation:"高风险环境或战略转型迫使企业进行流程再造。"},
+{type:"multiple",text:"11. BPR 的典型特点有（ ）",options:["以流程为中心","打破职能壁垒","大量应用先进 IT","范围与深度通常较大","仅做局部微调"],answer:["以流程为中心","打破职能壁垒","大量应用先进 IT","范围与深度通常较大"],explanation:"BPR 关注跨职能端到端重塑，需 IT 赋能且变革广泛深入。"},
+{type:"judge",text:"12. “BPR 可以在很短时间内完成，无需长期投入。”",options:["对","错"],answer:"错",explanation:"流程再造往往伴随文化、系统与组织重构，需要长期资源投入。"},
+{type:"multiple",text:"13. 下列 DFD 符号及含义配对正确的是（ ）",options:["开口矩形—数据存储","箭头—数据流","矩形—外部实体","圆角矩形—数据处理"],answer:["开口矩形—数据存储","箭头—数据流","矩形—外部实体","圆角矩形—数据处理"],explanation:"四大基本符号对应存储、流、边界与处理。"},
+{type:"judge",text:"14. “数据流程图只能展示数据流动，无法说明数据处理过程。”",options:["对","错"],answer:"错",explanation:"DFD 中的圆角矩形即表示处理，能描述转换逻辑。"},
+{type:"single",text:"15. 数据流程设计的第一步通常是（ ）",options:["确定数据来源与类型","设计处理算法","选择存储结构","绘制流程图"],answer:"确定数据来源与类型",explanation:"先明确数据对象，再谈处理与存储。"},
+{type:"multiple",text:"16. 完整的数据流程设计应包含（ ）",options:["数据来源与类型确定","处理算法设计","存储结构选择","安全与隐私措施","绘制详细 DFD"],answer:["数据来源与类型确定","处理算法设计","存储结构选择","安全与隐私措施","绘制详细 DFD"],explanation:"五部分环环相扣，缺一将导致流程缺陷。"},
+{type:"judge",text:"17. “数据流程设计必须先确定处理算法，再考虑数据来源。”",options:["对","错"],answer:"错",explanation:"数据驱动设计原则强调先数据后算法。"},
+{type:"judge",text:"18. 数据完整性与安全性是数据流程设计的重要考量。",options:["对","错"],answer:"对",explanation:"合法合规与业务连续性均依赖完整性与安全性保障。"},
+{type:"single",text:"19. 数据流程分析的主要目的在于（ ）",options:["评估存储量","确定处理速度","理解数据流动与处理过程","提高硬件性能"],answer:"理解数据流动与处理过程",explanation:"分析阶段要找痛点、识因果，为后续优化奠基。"},
+{type:"single",text:"20. 对数据转换与计算逻辑进行详细描述的文档是（ ）",options:["数据列表","DFD","数据处理说明书","数据结构图"],answer:"数据处理说明书",explanation:"说明书详细记录每一步转换与规则，便于开发与审计。"},
+{type:"judge",text:"21. 数据流程分析是数据流程设计的前提和基础。",options:["对","错"],answer:"对",explanation:"先分析再设计符合系统工程方法论。"},
+{type:"single",text:"22. 数据流程优化最直接的目标通常是（ ）",options:["减少存储量","加快处理速度","降低维护成本","提高安全性"],answer:"加快处理速度",explanation:"优化强调性能瓶颈改善，以速度或吞吐为首。"},
+{type:"multiple",text:"23. 数据流程优化可涉及（ ）",options:["简化处理逻辑","优化存储结构","提升传输效率","强化安全策略","更换输入设备"],answer:["简化处理逻辑","优化存储结构","提升传输效率","强化安全策略"],explanation:"前四项均直接提升效率与质量，输入设备更换属外围手段。"},
+{type:"judge",text:"24. 数据流程优化是持续过程，需要定期评估与调整。",options:["对","错"],answer:"对",explanation:"业务与技术环境变化驱动持续迭代。"},
+{type:"single",text:"25. 数据流程标准化的核心目的是（ ）",options:["提高速度","增加存储量","确保流程一致性与可预测性","降低风险"],answer:"确保流程一致性与可预测性",explanation:"统一规范以便跨系统协同与质量控制。"},
+{type:"multiple",text:"26. 实施数据流程标准化时通常要统一（ ）",options:["处理步骤","传输协议","存储格式","安全标准","可视化工具"],answer:["处理步骤","传输协议","存储格式","安全标准"],explanation:"流程、接口、数据及安全需统一；工具可因地制宜。"},
+{type:"judge",text:"27. “只需制定规则即可完成标准化，不必考虑业务场景差异。”",options:["对","错"],answer:"错",explanation:"脱离场景的统一规则往往难落地，需结合实际定级分类。"},
+{type:"multiple",text:"28. 提升跨部门协作效果的有效做法包括（ ）",options:["设定明确共同目标","信息共享透明","各部门完全独立决策","建立及时反馈机制","培养相互信任"],answer:["设定明确共同目标","信息共享透明","建立及时反馈机制","培养相互信任"],explanation:"目标、透明、反馈与信任是协作四基石。"},
+{type:"multiple",text:"29. 评估客户满意度时常用的指标有（ ）",options:["投诉次数","满意度调查结果","购买金额","客户维系率","占有率"],answer:["投诉次数","满意度调查结果","客户维系率"],explanation:"购买金额与占有率偏向价值链/市场指标，不直接反映满意度。"},
+{type:"multiple",text:"30. 波特价值链中的支持活动包括（ ）",options:["内部物流","采购","技术开发","人力资源管理","企业基础设施"],answer:["采购","技术开发","人力资源管理","企业基础设施"],explanation:"支持活动为 Procurement、Technology Development、HRM、Firm Infrastructure。"},
+{type:"multiple",text:"31. 实际成本核算的一般步骤包括（ ）",options:["制定标准成本","记录实际成本","分析成本差异","调整生产过程","衡量成本控制成果"],answer:["制定标准成本","记录实际成本","分析成本差异","调整生产过程","衡量成本控制成果"],explanation:"五步骤构成 PDCA 式闭环，支撑成本管理。"}
+];
+
+    const quizDiv=document.getElementById("quiz");
+
+    questions.forEach((q,index)=>{
+      const container=document.createElement("div");
+      container.className="question";
+      container.innerHTML=`<p>${q.text}</p>`;
+      let optionsHTML="";
+      if(q.type==="single"||q.type==="judge"){
+        q.options.forEach(opt=>{
+          optionsHTML+=`<label><input type="radio" name="q${index}" value="${opt}" onchange="checkAnswer(${index})"> ${opt}</label>`;
+        });
+      }else if(q.type==="multiple"){
+        q.options.forEach(opt=>{
+          optionsHTML+=`<label><input type="checkbox" name="q${index}" value="${opt}" onchange="checkMultiple(${index})"> ${opt}</label>`;
+        });
+        optionsHTML+=`<div class="counter" id="counter${index}">已选择 0 项</div>`;
+        optionsHTML+=`<div class="clear-btn" onclick="clearMultiple(${index})">清空选择</div>`;
+      }
+      container.innerHTML+=optionsHTML;
+      container.innerHTML+=`<div class="hint" onclick="showHint(${index})">查看答案提示</div>`;
+      container.innerHTML+=`<div id="result${index}" class="result"></div>`;
+      quizDiv.appendChild(container);
+    });
+
+    function checkAnswer(i){
+      const q=questions[i];
+      const inputs=document.getElementsByName(`q${i}`);
+      let userAnswer;
+      for(const input of inputs){if(input.checked){userAnswer=input.value;break}}
+      const correct=userAnswer===q.answer;
+      document.getElementById(`result${i}`).innerHTML=`<div class="${correct?'correct':'incorrect'}">${correct?'✔ 回答正确：':'✘ 回答错误：'}${q.explanation}</div>`;
+    }
+
+    function checkMultiple(i){
+      const q=questions[i];
+      const inputs=document.getElementsByName(`q${i}`);
+      const selected=Array.from(inputs).filter(inp=>inp.checked);
+      document.getElementById(`counter${i}`).textContent=`已选择 ${selected.length} 项`;
+      if(selected.length<q.answer.length)return;
+      const userAnswer=selected.map(i=>i.value).sort();
+      const correctAnswer=q.answer.slice().sort();
+      const correct=JSON.stringify(userAnswer)===JSON.stringify(correctAnswer);
+      document.getElementById(`result${i}`).innerHTML=`<div class="${correct?'correct':'incorrect'}">${correct?'✔ 回答正确：':'✘ 回答错误：'}${q.explanation}</div>`;
+    }
+
+    function clearMultiple(i){
+      const inputs=document.getElementsByName(`q${i}`);
+      inputs.forEach(inp=>inp.checked=false);
+      document.getElementById(`counter${i}`).textContent="已选择 0 项";
+      document.getElementById(`result${i}`).innerHTML="";
+    }
+
+    function showHint(i){
+      const q=questions[i];
+      document.getElementById(`result${i}`).innerHTML=`<div class="correct">提示：${q.explanation}</div>`;
+    }
+  </script>
+</body>
+</html>
